@@ -11,7 +11,12 @@ class NcaaGame(object):
         self.seed2 = None
         self.winner= None
         self.points = None
+        self.bonus = 0
     
+    def setBonus(self, bonus):
+        self.bonus = bonus
+    def getBonus(self):
+        return self.bonus    
     def setTeam1(self, team):
         self.team1 = team
     def setTeam2(self, team):
@@ -54,9 +59,9 @@ class NcaaGame(object):
         
     def getData(self):
         print 'team1: ' + str(self.team1) + '\n' +'team2: ' + str(self.team2) +\
-        '\n' +'Result: ' + str(self.result) + '\n'+ 'winner: '+ str(self.winner)+\
+        '\n' +'result: ' + str(self.result) + '\n'+ 'winner: '+ str(self.winner)+\
         '\n' + 'seed1: ' + str(self.seed1) + '\n' + 'seed2: ' + str(self.seed2) +\
-        '\n' + 'points: ' + str(self.points)
+        '\n' + 'points: ' + str(self.points) + '\n' + 'Bonus: ' + str(self.bonus)
         
 class NcaaTournament(object):
     def __init__(self, teams, points = [1,2,4,8,10,20]):
@@ -134,6 +139,7 @@ class mainTournament(NcaaTournament):
         if team2 != self.games[gameNum].team1 and team2 != self.games[gameNum].team2:
             return "Team 2 is not a valid team for GameID"
         
+        
         self.games[gameNum].setResult(team2, team2score)
         self.games[gameNum].setResult(team1, team1score)
         
@@ -150,10 +156,16 @@ class mainTournament(NcaaTournament):
         
         if team1score > team2score:
             winner = team1
+            
             seed = self.games[gameNum].getSeed1()
+            
+            self.games[gameNum].setBonus(max(0, seed - self.games[gameNum].getSeed2()))
+            
         else:
             winner = team2
-        
+            self.games[gameNum].setBonus(max(0, seed - self.games[gameNum].getSeed1()))
+            
+            
         self.games[gameNum].setWinner(winner)
         
         if self.games[gameNum] == aftGame.getBefore1():
@@ -168,6 +180,7 @@ class TournamentEntry(NcaaTournament):
         self.owner = Owner
         
     def addPicks(self, picks):
+        
         for i in range(len(self.games)):
             self.games[i].setWinner(picks[i])
             
